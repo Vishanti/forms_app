@@ -47,88 +47,73 @@ class _RegisterView extends StatelessWidget {
   }
 }
 
-class _RegisterForm extends StatefulWidget {
+class _RegisterForm extends StatelessWidget {
   const _RegisterForm({super.key});
 
-  @override
-  State<_RegisterForm> createState() => _RegisterFormState();
-}
-
-class _RegisterFormState extends State<_RegisterForm> {
   // Como se esta manejando con otro gestor de estado no es necesario tener las propiedades
   // Principalmente no es necesario un StatefulWidget
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  // * EL key no es necesario ya que no va delegar la funcionalidad de validate
+  // final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  // *
+
   // String username = '';
   // String email = '';
   // String password = '';
+
+  // * Se cambia a StateLess debido a que no tendremos que manejar estado, eso lo hace el gestor
+
   @override
   Widget build(BuildContext context) {
     final registerCubit = context.watch<RegisterCubit>();
+    final username = registerCubit.state.username;
+    final password = registerCubit.state.password;
+    final email = registerCubit.state.email;
     return Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            CustomTextFormField(
-              label: 'Nombre de usuario',
-              onChanged: (p0) {
-                registerCubit.usernameChanged(p0);
-                _formKey.currentState?.validate();
-              },
-              validator: (p0) {
-                if (p0 == null || p0.isEmpty) return 'Campo Requerido';
-                if (p0.trim().isEmpty) return 'Campo Requerido';
-                if (p0.length < 3) return 'Más de 3 letras';
-                return null;
-              },
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            CustomTextFormField(
-              label: 'Correo electronico',
-              onChanged: (p1) {
-                registerCubit.emailChanged(p1);
-                _formKey.currentState?.validate();
-              },
-              validator: (p1) {
-                if (p1 == null || p1.isEmpty) return 'Campo Requerido';
-                if (p1.trim().isEmpty) return 'Campo Requerido';
-                final emailRegExp = RegExp(
-                  r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                );
-                if (!emailRegExp.hasMatch(p1)) {
-                  return 'No tiene formato de correo';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            CustomTextFormField(
-              label: 'Contraseña',
-              obscureText: true,
-              onChanged: (p2) {
-                registerCubit.passwordChanged(p2);
-                _formKey.currentState?.validate();
-              },
-              validator: (p2) {
-                if (p2 == null || p2.isEmpty) return 'Campo Requerido';
-                if (p2.trim().isEmpty) return 'Campo Requerido';
-                if (p2.length < 3) return 'Más de 6 letras';
-                return null;
-              },
-            ),
-            const SizedBox(height: 20),
-            FilledButton.tonalIcon(
-                onPressed: () {
-                  // final isValid = _formKey.currentState?.validate();
-                  // if (!isValid!) return;
-                  registerCubit.onSubmit();
-                },
-                icon: const Icon(Icons.save),
-                label: const Text('Crear Usuario')),
-          ],
-        ));
+      // key: _formKey,
+      child: Column(
+        children: [
+          CustomTextFormField(
+            label: 'Nombre de usuario',
+            onChanged: (p0) {
+              registerCubit.usernameChanged(p0);
+              // _formKey.currentState?.validate();
+            },
+            errorMessage: username.errorMessage,
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          CustomTextFormField(
+            label: 'Correo electronico',
+            onChanged: (p1) {
+              registerCubit.emailChanged(p1);
+              // _formKey.currentState?.validate();
+            },
+            errorMessage: email.errorMessage,
+          ),
+          const SizedBox(height: 10),
+          CustomTextFormField(
+            label: 'Contraseña',
+            obscureText: true,
+            onChanged: (p2) {
+              registerCubit.passwordChanged(p2);
+              // _formKey.currentState?.validate();
+            },
+            errorMessage: password.errorMessage,
+          ),
+          const SizedBox(height: 20),
+          FilledButton.tonalIcon(
+            onPressed: () {
+              // final isValid = _formKey.currentState?.validate();
+              // if (!isValid!) return;
+              registerCubit.onSubmit();
+            },
+            icon: const Icon(Icons.save),
+            label: const Text('Crear Usuario'),
+          ),
+        ],
+      ),
+    );
   }
 }
